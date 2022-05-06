@@ -34,13 +34,13 @@ import retrofit2.await
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the status of the most recent request
-    private val _status = MutableLiveData<String>()
+    private val _status = MutableLiveData<MarsApiStatus>()
 
     private val _properties = MutableLiveData<List<MarsProperty>>()
     val properties: LiveData<List<MarsProperty>> get() = _properties
 
     // The external immutable LiveData for the request status String
-    val status: LiveData<String>
+    val status: LiveData<MarsApiStatus>
         get() = _status
 
     private var viewModelJob = Job()
@@ -61,12 +61,13 @@ class OverviewViewModel : ViewModel() {
         coroutineScope.launch {
             val getPropertiesDeferred = MarsApi.retrofitService.getProperties()
             try {
+                _status.value = MarsApiStatus.LOADING
                 var listResult = getPropertiesDeferred.await()
-                if (listResult.isNotEmpty()) {
-                    _properties.value = listResult
-                }
+                _properties.value = listResult
+                _status.value = MarsApiStatus.DONE
             } catch (t: Throwable) {
-                _status.value = "Failure: ${t.message}"
+                _status.value = MarsApiStatus.ERROR
+                _properties.value = ArrayList()
             }
         }
     }
