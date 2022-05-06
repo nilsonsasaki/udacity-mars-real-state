@@ -27,6 +27,8 @@ import com.example.android.marsrealestate.databinding.FragmentOverviewBinding
 /**
  * This fragment shows the the status of the Mars real-estate web services transaction.
  */
+enum class MarsApiStatus {LOADING, ERROR, DONE }
+
 class OverviewFragment : Fragment() {
 
     /**
